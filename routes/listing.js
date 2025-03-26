@@ -22,6 +22,12 @@ router.get("/",wrapAsync(async (req,res)=>{
  router.get("/:id",wrapAsync(async (req,res)=>{
      const {id}=req.params
      const listing=await Listing.findById(id)
+     console.log(listing);
+     
+     if(!listing){
+        req.flash("error","Listing youn are looking for is not exits")
+        res.redirect("/listings")
+     }
      res.render("listings/show.ejs",{listing})
  }))
  
@@ -54,6 +60,7 @@ router.get("/",wrapAsync(async (req,res)=>{
      //     throw new ExpressError(400,"Location is Missing")
      // }
      await newListing.save()
+     req.flash("success","New Listing Creted Successfully")
      res.redirect("/listings")
  }))
  
@@ -61,6 +68,10 @@ router.get("/",wrapAsync(async (req,res)=>{
  router.get("/:id/edit",wrapAsync(async (req,res)=>{
      let {id}=req.params
      const listing=await Listing.findById(id);
+     if(!listing){
+        req.flash("error","Listing youn are looking for is not exits")
+        res.redirect("/listings")
+     }
      res.render("listings/edit.ejs",{listing})
  }))
  
@@ -69,6 +80,7 @@ router.get("/",wrapAsync(async (req,res)=>{
      let {id}=req.params
      
      await Listing.findByIdAndUpdate(id,{...req.body.listing})
+     req.flash("success","Listings Updated successfully")
      res.redirect(`/listings/${id}`)
  }))
  
@@ -76,6 +88,7 @@ router.get("/",wrapAsync(async (req,res)=>{
  router.delete("/:id",wrapAsync(async (req,res)=>{
      let {id}=req.params
      await Listing.findByIdAndDelete(id)
+     req.flash("success","Listing Delted Successfully")
      res.redirect("/listings")
  }))
  

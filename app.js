@@ -12,6 +12,8 @@ const wrapAsync=require("./utils/wrapAsync")
 const ExpressError=require("./utils/ExpressError")
 const listingSchema=require("./schema.js")
 const listings=require("./routes/listing.js")
+const session=require("express-session")
+const flash=require("connect-flash")
 
 
 app.engine('ejs', ejsMate);
@@ -21,6 +23,19 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 app.use(express.static(path.join(__dirname,"public")))
+const sessionOption={
+    secret:"secretcode",
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        httpOnly:true,
+        expires:Date.now()+1000*60*60*24*7,
+        maxAge:1000*60*60*24*7,
+        httpOnly:true
+    }
+}
+app.use(session(sessionOption))
+app.use(flash())
 main().then(()=>{
     console.log("Connected to database")
 })
@@ -43,7 +58,12 @@ async function main(){
 //     await sampleListing.save()
 //     res.send("data saved successfully...")
 // })
-
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success")
+    console.log(res.locals.success)
+    res.locals.error=req.flash("error")
+    next()
+})
 app.use("/listings",listings)
 app.all("*",( req,res,next)=>{
     next(new ExpressError(404,"Page Not Found!!"))
