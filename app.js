@@ -77,14 +77,14 @@ app.use((req,res,next)=>{
 })
 
 // Authntication
-app.get("/fakeuser", async (req,res)=>{
-    let fakeuser=new User({
-        email:"kk1843095@gmail.com",
-        username:"kuldeep"
-    })
-    let registereduser=await User.register(fakeuser,"15kKK12$")
-    res.send(registereduser)
-})
+// app.get("/fakeuser", async (req,res)=>{
+//     let fakeuser=new User({
+//         email:"kk1843095@gmail.com",
+//         username:"kuldeep"
+//     })
+//     let registereduser=await User.register(fakeuser,"15kKK12$")
+//     res.send(registereduser)
+// })
 
 app.use("/listings",listingsRouter)
 app.use("/",userRoueter)
