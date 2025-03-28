@@ -11,10 +11,13 @@ const ejsMate=require("ejs-mate")
 const wrapAsync=require("./utils/wrapAsync")
 const ExpressError=require("./utils/ExpressError")
 const listingSchema=require("./schema.js")
-const listings=require("./routes/listing.js")
+const listingsRouter=require("./routes/listing.js")
 const session=require("express-session")
 const flash=require("connect-flash")
-
+const passport=require("passport")
+const LocalStrategy=require("passport-local")
+const User=require("./models/user.js")
+const userRoueter=require("./routes/user.js")//for user authentication
 
 app.engine('ejs', ejsMate);
 app.set("view engine","ejs")
@@ -36,6 +39,14 @@ const sessionOption={
 }
 app.use(session(sessionOption))
 app.use(flash())
+
+// passport configuration
+app.use(passport.initialize())
+app.use(passport.session())
+passport.use(new LocalStrategy(User.authenticate()))
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
+
 main().then(()=>{
     console.log("Connected to database")
 })
@@ -64,7 +75,19 @@ app.use((req,res,next)=>{
     res.locals.error=req.flash("error")
     next()
 })
-app.use("/listings",listings)
+
+// Authntication
+app.get("/fakeuser", async (req,res)=>{
+    let fakeuser=new User({
+        email:"kk1843095@gmail.com",
+        username:"kuldeep"
+    })
+    let registereduser=await User.register(fakeuser,"15kKK12$")
+    res.send(registereduser)
+})
+
+app.use("/listings",listingsRouter)
+app.use("/",userRoueter)
 app.all("*",( req,res,next)=>{
     next(new ExpressError(404,"Page Not Found!!"))
 })
