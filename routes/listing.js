@@ -5,6 +5,7 @@ const wrapAsync=require("../utils/wrapAsync")
 const listingSchema=require("../schema.js")
 const ExpressError=require("../utils/ExpressError")
 const Listing=require("../models/listings")
+const {isLoggedIn}=require("../middleware.js")
 
 //Index Route
 router.get("/",wrapAsync(async (req,res)=>{
@@ -14,15 +15,20 @@ router.get("/",wrapAsync(async (req,res)=>{
  }))
  
  //New Route
- router.get("/new",(req,res)=>{
-     res.render("listings/new.ejs")
+ router.get("/new",isLoggedIn,(req,res)=>{
+    // console.log(req.user);
+    if(!req.isAuthenticated()){
+        req.flash("error","you must be  logged in to create listing !")
+        return res.redirect("/login")
+    }
+    res.render("listings/new.ejs")
  })
  
  //show Route
  router.get("/:id",wrapAsync(async (req,res)=>{
      const {id}=req.params
      const listing=await Listing.findById(id)
-     console.log(listing);
+    //  console.log(listing);
      
      if(!listing){
         req.flash("error","Listing youn are looking for is not exits")
@@ -32,7 +38,7 @@ router.get("/",wrapAsync(async (req,res)=>{
  }))
  
  //Create Route
- router.post("/",wrapAsync(async (req,res,next)=>{
+ router.post("/",isLoggedIn,wrapAsync(async (req,res,next)=>{
      // let {title,description,price,location,country}=req.body
      // if(!req.body.listing){
      //    throw new ExpressError(400,"Send Valid data for listing..");
@@ -65,7 +71,7 @@ router.get("/",wrapAsync(async (req,res)=>{
  }))
  
  //Edit Route
- router.get("/:id/edit",wrapAsync(async (req,res)=>{
+ router.get("/:id/edit",isLoggedIn,wrapAsync(async (req,res)=>{
      let {id}=req.params
      const listing=await Listing.findById(id);
      if(!listing){
@@ -76,7 +82,7 @@ router.get("/",wrapAsync(async (req,res)=>{
  }))
  
  //Update Route
- router.put("/:id",wrapAsync(async (req,res)=>{
+ router.put("/:id",isLoggedIn,wrapAsync(async (req,res)=>{
      let {id}=req.params
      
      await Listing.findByIdAndUpdate(id,{...req.body.listing})
@@ -85,7 +91,7 @@ router.get("/",wrapAsync(async (req,res)=>{
  }))
  
  //Delete Route
- router.delete("/:id",wrapAsync(async (req,res)=>{
+ router.delete("/:id",isLoggedIn,wrapAsync(async (req,res)=>{
      let {id}=req.params
      await Listing.findByIdAndDelete(id)
      req.flash("success","Listing Delted Successfully")
