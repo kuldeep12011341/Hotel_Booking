@@ -15,7 +15,7 @@ router.get("/",wrapAsync(async (req,res)=>{
  }))
  
  //New Route
- router.get("/new",isLoggedIn,(req,res)=>{
+ router.get("/new",isLoggedIn,(req,res)=>{ 
     // console.log(req.user);
     if(!req.isAuthenticated()){
         req.flash("error","you must be  logged in to create listing !")
@@ -28,7 +28,7 @@ router.get("/",wrapAsync(async (req,res)=>{
  router.get("/:id",wrapAsync(async (req,res)=>{
      const {id}=req.params
      const listing=await Listing.findById(id)
-    //  console.log(listing);
+      console.log("---",listing);
      
      if(!listing){
         req.flash("error","Listing youn are looking for is not exits")
