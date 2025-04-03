@@ -27,13 +27,12 @@ router.get("/",wrapAsync(async (req,res)=>{
  //show Route
  router.get("/:id",wrapAsync(async (req,res)=>{
      const {id}=req.params
-     const listing=await Listing.findById(id)
-      console.log("---",listing);
-     
+     const listing=await Listing.findById(id).populate("owner")
      if(!listing){
         req.flash("error","Listing youn are looking for is not exits")
         res.redirect("/listings")
      }
+     console.log(listing);
      res.render("listings/show.ejs",{listing})
  }))
  
@@ -65,6 +64,8 @@ router.get("/",wrapAsync(async (req,res)=>{
      // if(!newListing.location){
      //     throw new ExpressError(400,"Location is Missing")
      // }
+    //  console.log(req.user);
+     newListing.owner=req.user._id
      await newListing.save()
      req.flash("success","New Listing Creted Successfully")
      res.redirect("/listings")
