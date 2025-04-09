@@ -12,7 +12,7 @@
         <p class="card-text"></p><%= listing.location %> </p>
         <p class="card-text"></p><%= listing.country %> </p>
         </div>
-    </div> 
+    </div>  
     <div class="btns">
         <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1  offset-3 edit-btn">Edit</a>
             <form action="/listings/<%= listing._id %>?_method=Delete" method="post" >
@@ -20,5 +20,6 @@
             </form>
     </div>
 </div>
+<br>
 
 
